@@ -8,9 +8,13 @@
 import UIKit
 import MapKit
 
-class MapViewController: UIViewController{
+class MapViewController: UIViewController, CLLocationManagerDelegate{
     
     var mapView: MKMapView!
+    
+    var currentLocation: CLLocation!
+    var locationManager = CLLocationManager()
+    
     
     override func loadView(){
         // create a map view
@@ -66,13 +70,50 @@ class MapViewController: UIViewController{
         
         switchTopConstraint.isActive = true
         switchLeadingConstraint.isActive = true
+        
+        // Adding the Button
+        let fmButton = UIButton()
+        fmButton.setTitle("Find Me", for: .normal)
+        fmButton.setTitleColor(UIColor.black, for: .normal)
+        fmButton.backgroundColor = UIColor.white
+        fmButton.layer.borderWidth = 1
+        fmButton.layer.cornerRadius = 2
+        
+        fmButton.addTarget(self, action: #selector(findActive(_:)), for: .touchDown)
+        
+        fmButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(fmButton)
+        
+        let fmButtonTopConstraint = fmButton.topAnchor.constraint(equalTo: pointsLabel.bottomAnchor, constant:8)
+        let fmButtonLeadingConstraint = fmButton.leadingAnchor.constraint(equalTo: margins.leadingAnchor)
+        
+        let fmButtonWidthConstraint = fmButton.widthAnchor.constraint(
+        equalToConstant: fmButton.titleLabel!.intrinsicContentSize.width + 2.0 * 3)
+        
+        fmButtonTopConstraint.isActive = true
+        fmButtonLeadingConstraint.isActive = true
+        fmButtonWidthConstraint.isActive = true
+        
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         print("MapViewController loaded its view")
+        
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.requestAlwaysAuthorization()
+        locationManager.startUpdatingLocation()
+
     }
     
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        self.currentLocation = locations.last as CLLocation?
+    }
+    
+    
+    
+ 
     @objc func mapTypeChanged(_ segControl: UISegmentedControl){
         switch segControl.selectedSegmentIndex {
         case 0:
@@ -97,5 +138,31 @@ class MapViewController: UIViewController{
         }
         
     }
+    
+    @objc func findActive(_ fmButton: UIButton){
+        	print("Find Me")
+        
+//        let btvCoord = CLLocationCoordinate2D(latitude: 44.4788381, longitude: -73.1974602)
+//        var fmSpan = MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
+//        var fmRegion = MKCoordinateRegion(center: btvCoord, latitudinalMeters: 100, longitudinalMeters: 100)
+//        mapView.setRegion(fmRegion, animated: true)
+//        var currMarker = MKPointAnnotation()
+//        currMarker.coordinate = btvCoord
+//        mapView.addAnnotation(currMarker)
+        
+        let center = CLLocationCoordinate2D(latitude: currentLocation!.coordinate.latitude, longitude: currentLocation!.coordinate.longitude)
+        let span = MKCoordinateSpan(latitudeDelta: 0.003, longitudeDelta: 0.003)
+        let region = MKCoordinateRegion(center: center, span: span)
+        self.mapView.setRegion(region, animated: true)
+        
+        var currMarker = MKPointAnnotation()
+        currMarker.coordinate = center
+        mapView.removeAnnotations(mapView.annotations)
+        mapView.addAnnotation(currMarker)
+        
+        
+    }
+    
+    
     
 }
