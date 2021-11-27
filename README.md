@@ -9,3 +9,9 @@ The images below show the comparision of the "points of interest" switch being a
 ![Find Me with Points of Interest](fm_poi.png)
 
 ![Find Me with No Points of Interest](fm_no_poi.png)
+
+## Feature Notes
+
+ - The project files are using the iOS simulator 14.0 (I think). I did see the screen prompting me to allow location once. However, I was not able to duplicate that series of events again. 
+
+ - There is no temperature screen as shown in the book. 
