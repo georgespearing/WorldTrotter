@@ -12,6 +12,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate{
     
     var mapView: MKMapView!
     
+    // location variables
     var currentLocation: CLLocation!
     var locationManager = CLLocationManager()
     
@@ -23,6 +24,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate{
         // set it as *the* view of this view controller
         view = mapView
         
+        // MARK: - Segmented Map Views
         let segmentedControl = UISegmentedControl(items: ["Standard", "Hybrid", "Satellite"])
         segmentedControl.backgroundColor = UIColor.systemBackground
         segmentedControl.selectedSegmentIndex = 0
@@ -43,6 +45,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate{
         topConstraint.isActive = true
         leadingConstraint.isActive = true
         trailingConstraint.isActive = true
+        
+        // MARK: - POI Label and Switch
         
         // Adding the label
         let pointsLabel = UILabel()
@@ -100,6 +104,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate{
         super.viewDidLoad()
         print("MapViewController loaded its view")
         
+        // initializing the location manager when the view is loaded
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestAlwaysAuthorization()
@@ -107,13 +112,12 @@ class MapViewController: UIViewController, CLLocationManagerDelegate{
 
     }
     
+    // updating the current location using the GPS locaiton value
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         self.currentLocation = locations.last as CLLocation?
     }
     
-    
-    
- 
+   // If the segmented controller changes, change the mapView to the coresponding view
     @objc func mapTypeChanged(_ segControl: UISegmentedControl){
         switch segControl.selectedSegmentIndex {
         case 0:
@@ -127,6 +131,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate{
         }
     }
     
+    // When the POI Switch changes state, remove or add the points of interest filter
     @objc func poiDisplay(_ poiSwitch: UISwitch) {
         if poiSwitch.isOn{
             mapView.pointOfInterestFilter = MKPointOfInterestFilter(excluding: [] )
@@ -139,9 +144,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate{
         
     }
     
+    // When "Find Me" Button is pressed, update location, map view, and add annotation
     @objc func findActive(_ fmButton: UIButton){
-        	print("Find Me")
+        print("Find Me")
         
+        // Hard Code value to Burlington
 //        let btvCoord = CLLocationCoordinate2D(latitude: 44.4788381, longitude: -73.1974602)
 //        var fmSpan = MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
 //        var fmRegion = MKCoordinateRegion(center: btvCoord, latitudinalMeters: 100, longitudinalMeters: 100)
@@ -150,11 +157,13 @@ class MapViewController: UIViewController, CLLocationManagerDelegate{
 //        currMarker.coordinate = btvCoord
 //        mapView.addAnnotation(currMarker)
         
+        // get locaiton from GPS (or the "Location" in the Simulator)
         let center = CLLocationCoordinate2D(latitude: currentLocation!.coordinate.latitude, longitude: currentLocation!.coordinate.longitude)
         let span = MKCoordinateSpan(latitudeDelta: 0.003, longitudeDelta: 0.003)
         let region = MKCoordinateRegion(center: center, span: span)
         self.mapView.setRegion(region, animated: true)
         
+        // remove old annotations and add the current location
         var currMarker = MKPointAnnotation()
         currMarker.coordinate = center
         mapView.removeAnnotations(mapView.annotations)
